@@ -1,0 +1,6 @@
+wxPython
+pandas
+reportlab
+qrcode
+PyPDF2
+pywin32; sys_platform == 'win32'

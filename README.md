@@ -9,7 +9,7 @@
 
 本程式為醫院藥局使用的 **藥品標籤列印工具**，供藥師透過輸入「料位號」快速查詢藥品資訊，並自動產生含有 **QR Code** 的 PDF 標籤，透過印表機列印貼附於藥品儲位或調配容器上。
 
-Mac 版以 `main_mac.py` 為主程式，使用 **wxPython** 建立桌面 GUI 介面。
+Mac 版以 `main_mac.py` 為主程式，Windows 版以 `main.py` 為主程式，兩者皆使用 **wxPython** 建立桌面 GUI 介面。
 
 ---
 
@@ -61,17 +61,24 @@ Mac 版以 `main_mac.py` 為主程式，使用 **wxPython** 建立桌面 GUI 介
 
 ---
 
-## 五、Mac 版環境需求
+## 五、環境需求與安裝
 
-### Python 套件
+### Python 套件依賴
 
+專案依賴已整理在 `requirements.txt` 中。其中 `pywin32` 為 Windows 版專屬套件，Mac 環境下安裝時將自動忽略。
+請使用以下指令安裝所有依賴套件：
+
+```bash
+pip install -r requirements.txt
 ```
-wxPython
-pandas
-reportlab
-qrcode
-PyPDF2
-```
+
+核心依賴包含：
+- `wxPython` (GUI 框架)
+- `pandas` (資料處理)
+- `reportlab` (PDF 產生)
+- `qrcode` (QR Code 產生)
+- `PyPDF2` (PDF 頁面處理)
+- `pywin32` (Windows 版專用的列印控制)
 
 ### 系統字體依賴
 
@@ -83,9 +90,16 @@ PyPDF2
 
 ### 啟動方式
 
-```bash
-python3 main_mac.py
-```
+確保系統環境與字體設定正確後，可根據作業系統啟動對應的主程式：
+
+- **Windows 環境**：
+  ```bash
+  python main.py
+  ```
+- **Mac 環境**：
+  ```bash
+  python3 main_mac.py
+  ```
 
 ---
 
