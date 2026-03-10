@@ -22,15 +22,31 @@ pdfmetrics.registerFont(TTFont('Bold', '/System/Library/Fonts/STHeiti Medium.ttc
 
 class MyFrame(wx.Frame):
     def __init__(self, parent, id, title):
-        super(MyFrame, self).__init__(parent, id, title, size=(450, 450))
+        super(MyFrame, self).__init__(parent, id, title, size=(520, 560))
         global global_font, special_font, special_font2
-        
+
+        # 色彩常量
+        self.COLOR_BG = wx.Colour(240, 244, 248)          # 淺灰藍背景
+        self.COLOR_HEADER_BG = wx.Colour(27, 58, 92)      # 深藍標題背景
+        self.COLOR_HEADER_FG = wx.Colour(255, 255, 255)   # 白色標題文字
+        self.COLOR_BTN_CONFIRM = wx.Colour(46, 134, 171)  # 藍色確認鈕
+        self.COLOR_BTN_PRINT = wx.Colour(39, 174, 96)     # 綠色列印鈕
+        self.COLOR_BTN_TEXT = wx.Colour(255, 255, 255)    # 按鈕白字
+        self.COLOR_RESULT_BG = wx.Colour(255, 253, 231)   # 淡黃結果底
+        self.COLOR_LABEL = wx.Colour(50, 50, 50)          # 標籤深灰
+        self.COLOR_SECTION_BG = wx.Colour(255, 255, 255)  # 白色區塊
+
         # 使用 Mac 的字型名稱
-        global_font = wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL, False, u'Heiti TC')
-        special_font = wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, False, u'Heiti TC')
-        special_font2 = wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.NORMAL, False, u'Heiti TC')
-        
+        global_font = wx.Font(13, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, u'Heiti TC')
+        special_font = wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, u'Heiti TC')
+        special_font2 = wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, u'Heiti TC')
+        header_font = wx.Font(18, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, u'Heiti TC')
+        section_label_font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, u'Heiti TC')
+        input_label_font = wx.Font(13, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, u'Heiti TC')
+        btn_font = wx.Font(13, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, u'Heiti TC')
+
         self.SetFont(global_font)
+        self.SetBackgroundColour(self.COLOR_BG)
         self.is_query_done = False
 
         # 設置窗口圖示 (如果找不到不報錯)
@@ -39,50 +55,111 @@ class MyFrame(wx.Frame):
             self.SetIcon(icon)
         except:
             pass
-            
+
         self.statusbar = self.CreateStatusBar(3)
-        self.SetMinSize((400, 400))
+        self.SetMinSize((480, 500))
 
-        main_sizer = wx.BoxSizer(wx.VERTICAL)
-        input_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        # --- 主面板 ---
         panel = wx.Panel(self)
-        self.query_label = wx.StaticText(panel, label="請輸入料位號")
-        self.query_input = wx.TextCtrl(panel, style=wx.TE_PROCESS_ENTER, size=(-1, 40))
-        self.confirm_button = wx.Button(panel, label="確認", size=(100, 40))
+        panel.SetBackgroundColour(self.COLOR_BG)
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        input_sizer.Add(self.query_label, 0, wx.ALIGN_BOTTOM | wx.ALL, 5)
-        input_sizer.Add(self.query_input, 1, wx.EXPAND | wx.ALL, 5)
-        input_sizer.Add(self.confirm_button, 0, wx.ALIGN_BOTTOM | wx.ALL, 5)
+        # ═══ 頂部標題區塊 ═══
+        header_panel = wx.Panel(panel)
+        header_panel.SetBackgroundColour(self.COLOR_HEADER_BG)
+        header_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.result_label = wx.StaticText(panel, label=" 查找結果：")
-        self.result_textctrl = wx.TextCtrl(panel, style=wx.TE_MULTILINE | wx.TE_READONLY)
+        header_label = wx.StaticText(header_panel, label="🏥  林口長庚 SATO 標籤列印系統")
+        header_label.SetFont(header_font)
+        header_label.SetForegroundColour(self.COLOR_HEADER_FG)
+        header_sizer.Add(header_label, 0, wx.ALL | wx.ALIGN_CENTER, 12)
+        header_panel.SetSizer(header_sizer)
 
-        main_sizer.Add(input_sizer, 0, wx.EXPAND | wx.ALL, 10)
-        main_sizer.Add(self.result_label, 0, wx.ALL, 10)
-        main_sizer.Add(self.result_textctrl, 1, wx.EXPAND | wx.ALL, 10)
+        main_sizer.Add(header_panel, 0, wx.EXPAND)
 
-        # 建立一個新的水平Sizer來容納列印相關的控件
+        # ═══ 輸入區塊 ═══
+        input_panel = wx.Panel(panel)
+        input_panel.SetBackgroundColour(self.COLOR_SECTION_BG)
+        input_outer_sizer = wx.BoxSizer(wx.VERTICAL)
+        input_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.query_label = wx.StaticText(input_panel, label="📋 請輸入料位號：")
+        self.query_label.SetFont(input_label_font)
+        self.query_label.SetForegroundColour(self.COLOR_LABEL)
+
+        self.query_input = wx.TextCtrl(input_panel, style=wx.TE_PROCESS_ENTER, size=(-1, 36))
+        self.query_input.SetFont(global_font)
+        self.query_input.SetBackgroundColour(wx.Colour(250, 250, 255))
+
+        self.confirm_button = wx.Button(input_panel, label="✔ 確認查詢", size=(120, 38))
+        self.confirm_button.SetFont(btn_font)
+        self.confirm_button.SetBackgroundColour(self.COLOR_BTN_CONFIRM)
+        self.confirm_button.SetForegroundColour(self.COLOR_BTN_TEXT)
+
+        input_sizer.Add(self.query_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
+        input_sizer.Add(self.query_input, 1, wx.EXPAND | wx.RIGHT, 8)
+        input_sizer.Add(self.confirm_button, 0, wx.ALIGN_CENTER_VERTICAL)
+
+        input_outer_sizer.Add(input_sizer, 0, wx.EXPAND | wx.ALL, 12)
+        input_panel.SetSizer(input_outer_sizer)
+
+        main_sizer.Add(input_panel, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 10)
+
+        # ═══ 查詢結果區塊 ═══
+        result_panel = wx.Panel(panel)
+        result_panel.SetBackgroundColour(self.COLOR_SECTION_BG)
+        result_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self.result_label = wx.StaticText(result_panel, label="🔍 查詢結果")
+        self.result_label.SetFont(section_label_font)
+        self.result_label.SetForegroundColour(self.COLOR_HEADER_BG)
+
+        self.result_textctrl = wx.TextCtrl(result_panel, style=wx.TE_MULTILINE | wx.TE_READONLY)
+        self.result_textctrl.SetFont(wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, u'Heiti TC'))
+        self.result_textctrl.SetBackgroundColour(self.COLOR_RESULT_BG)
+        self.result_textctrl.SetForegroundColour(wx.Colour(40, 40, 40))
+
+        result_sizer.Add(self.result_label, 0, wx.LEFT | wx.TOP, 12)
+        result_sizer.Add(self.result_textctrl, 1, wx.EXPAND | wx.ALL, 12)
+        result_panel.SetSizer(result_sizer)
+
+        main_sizer.Add(result_panel, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 10)
+
+        # ═══ 列印控制區塊 ═══
+        print_panel = wx.Panel(panel)
+        print_panel.SetBackgroundColour(self.COLOR_SECTION_BG)
+        print_outer_sizer = wx.BoxSizer(wx.VERTICAL)
         print_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.print_quantity_label = wx.StaticText(panel, label="選擇列印數量")
-        self.print_quantity_choices = ['1',  '5', '10']
-        self.print_quantity_combo = wx.ComboBox(panel, size=(100, -1), choices=self.print_quantity_choices,style=wx.CB_READONLY) 
+        self.print_quantity_label = wx.StaticText(print_panel, label="🖨 列印數量：")
+        self.print_quantity_label.SetFont(input_label_font)
+        self.print_quantity_label.SetForegroundColour(self.COLOR_LABEL)
+
+        self.print_quantity_choices = ['1', '5', '10']
+        self.print_quantity_combo = wx.ComboBox(print_panel, size=(80, -1), choices=self.print_quantity_choices, style=wx.CB_READONLY)
         self.print_quantity_combo.SetSelection(0)
+        self.print_quantity_combo.SetFont(special_font2)
 
-        self.print_button = wx.Button(panel, label="測試列印(Mac預覽)", size=(150, 40))
+        self.print_button = wx.Button(print_panel, label="🖨 測試列印 (Mac預覽)", size=(200, 38))
+        self.print_button.SetFont(btn_font)
+        self.print_button.SetBackgroundColour(self.COLOR_BTN_PRINT)
+        self.print_button.SetForegroundColour(self.COLOR_BTN_TEXT)
 
-        print_sizer.Add(self.print_quantity_label, 0, wx.ALIGN_BOTTOM | wx.ALL, 5)
-        print_sizer.Add(self.print_quantity_combo, 1, wx.EXPAND | wx.ALL, 5)
-        print_sizer.Add(self.print_button, 0, wx.ALIGN_BOTTOM | wx.ALL, 5)
+        print_sizer.Add(self.print_quantity_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 8)
+        print_sizer.Add(self.print_quantity_combo, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 16)
+        print_sizer.Add(self.print_button, 0, wx.ALIGN_CENTER_VERTICAL)
 
-        main_sizer.Add(print_sizer, 0, wx.EXPAND | wx.ALL, 10)
+        print_outer_sizer.Add(print_sizer, 0, wx.EXPAND | wx.ALL, 12)
+        print_panel.SetSizer(print_outer_sizer)
 
+        main_sizer.Add(print_panel, 0, wx.EXPAND | wx.ALL, 10)
+
+        # ═══ 事件綁定 ═══
         self.print_button.Bind(wx.EVT_BUTTON, self.on_print)
         self.confirm_button.Bind(wx.EVT_BUTTON, self.on_confirm)
         self.query_input.Bind(wx.EVT_TEXT_ENTER, self.on_confirm)
 
         self.statusbar.SetFont(special_font)
-        self.print_quantity_combo.SetFont(special_font2)
         panel.SetSizer(main_sizer)
 
         if getattr(sys, 'frozen', False):

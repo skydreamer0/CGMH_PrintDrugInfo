@@ -51,7 +51,7 @@ Mac 版以 `main_mac.py` 為主程式，使用 **wxPython** 建立桌面 GUI 介
 
 標籤尺寸為 **140mm × 84mm**，以下為實際產生的標籤範例：
 
-![標籤範例](label_sample.png)
+![標籤範例](label_sample.jpg)
 
 標籤內容包含：
 - **頂部**：料位號、藥品編號
