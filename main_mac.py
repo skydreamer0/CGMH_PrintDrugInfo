@@ -48,6 +48,7 @@ class MyFrame(wx.Frame):
         self.SetFont(global_font)
         self.SetBackgroundColour(self.COLOR_BG)
         self.is_query_done = False
+        self.current_font_size = 13  # 可調整基準字體大小
 
         # 設置窗口圖示 (如果找不到不報錯)
         try:
@@ -67,12 +68,35 @@ class MyFrame(wx.Frame):
         # ═══ 頂部標題區塊 ═══
         header_panel = wx.Panel(panel)
         header_panel.SetBackgroundColour(self.COLOR_HEADER_BG)
-        header_sizer = wx.BoxSizer(wx.VERTICAL)
+        header_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         header_label = wx.StaticText(header_panel, label="🏥  林口長庚 SATO 標籤列印系統")
         header_label.SetFont(header_font)
         header_label.SetForegroundColour(self.COLOR_HEADER_FG)
-        header_sizer.Add(header_label, 0, wx.ALL | wx.ALIGN_CENTER, 12)
+
+        # 字體大小調整按鈕
+        font_btn_font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, u'Heiti TC')
+        self.font_size_down_btn = wx.Button(header_panel, label="A-", size=(36, 28))
+        self.font_size_down_btn.SetFont(font_btn_font)
+        self.font_size_down_btn.SetBackgroundColour(wx.Colour(60, 90, 130))
+        self.font_size_down_btn.SetForegroundColour(wx.Colour(255, 255, 255))
+
+        self.font_size_label = wx.StaticText(header_panel, label="字體")
+        self.font_size_label.SetFont(wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, u'Heiti TC'))
+        self.font_size_label.SetForegroundColour(wx.Colour(200, 210, 220))
+
+        self.font_size_up_btn = wx.Button(header_panel, label="A+", size=(36, 28))
+        self.font_size_up_btn.SetFont(font_btn_font)
+        self.font_size_up_btn.SetBackgroundColour(wx.Colour(60, 90, 130))
+        self.font_size_up_btn.SetForegroundColour(wx.Colour(255, 255, 255))
+
+        self.font_size_down_btn.Bind(wx.EVT_BUTTON, lambda evt: self.on_font_size_change(-2))
+        self.font_size_up_btn.Bind(wx.EVT_BUTTON, lambda evt: self.on_font_size_change(2))
+
+        header_sizer.Add(header_label, 1, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 12)
+        header_sizer.Add(self.font_size_down_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
+        header_sizer.Add(self.font_size_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 4)
+        header_sizer.Add(self.font_size_up_btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 12)
         header_panel.SetSizer(header_sizer)
 
         main_sizer.Add(header_panel, 0, wx.EXPAND)
@@ -161,6 +185,7 @@ class MyFrame(wx.Frame):
         self.query_input.Bind(wx.EVT_TEXT_ENTER, self.on_confirm)
 
         self.statusbar.SetFont(special_font)
+        self.main_panel = panel
         panel.SetSizer(main_sizer)
 
         if getattr(sys, 'frozen', False):
@@ -174,6 +199,33 @@ class MyFrame(wx.Frame):
         self.is_confirm_button_pressed = False
         self.is_print_button_pressed = False
         panel.SetSizerAndFit(main_sizer)
+
+    def on_font_size_change(self, delta):
+        """調整整體字體大小"""
+        new_size = self.current_font_size + delta
+        if new_size < 10 or new_size > 24:
+            return
+        self.current_font_size = new_size
+        self.apply_font_size(new_size)
+
+    def apply_font_size(self, size):
+        """將字體大小套用到所有控件"""
+        base = wx.Font(size, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, u'Heiti TC')
+        bold = wx.Font(size, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, u'Heiti TC')
+        input_font = wx.Font(size + 3, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, u'Heiti TC')
+        result_font = wx.Font(size - 1, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, u'Heiti TC')
+
+        self.query_label.SetFont(base)
+        self.query_input.SetFont(input_font)
+        self.confirm_button.SetFont(bold)
+        self.result_label.SetFont(bold)
+        self.result_textctrl.SetFont(result_font)
+        self.print_quantity_label.SetFont(base)
+        self.print_quantity_combo.SetFont(wx.Font(size + 3, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, u'Heiti TC'))
+        self.print_button.SetFont(bold)
+
+        self.main_panel.Layout()
+        self.Refresh()
 
     def set_statusbar_info(self):
         author_info = "作者：蕭兆軒 "
