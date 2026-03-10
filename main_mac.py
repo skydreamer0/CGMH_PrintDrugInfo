@@ -87,9 +87,10 @@ class MyFrame(wx.Frame):
         self.query_label.SetFont(input_label_font)
         self.query_label.SetForegroundColour(self.COLOR_LABEL)
 
-        self.query_input = wx.TextCtrl(input_panel, style=wx.TE_PROCESS_ENTER, size=(-1, 36))
-        self.query_input.SetFont(global_font)
-        self.query_input.SetBackgroundColour(wx.Colour(250, 250, 255))
+        self.query_input = wx.TextCtrl(input_panel, style=wx.TE_PROCESS_ENTER, size=(-1, 40))
+        self.query_input.SetFont(wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, u'Heiti TC'))
+        self.query_input.SetBackgroundColour(wx.Colour(255, 255, 255))
+        self.query_input.SetForegroundColour(wx.Colour(0, 0, 0))
 
         self.confirm_button = wx.Button(input_panel, label="✔ 確認查詢", size=(120, 38))
         self.confirm_button.SetFont(btn_font)
